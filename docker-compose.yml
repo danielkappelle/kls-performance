@@ -1,0 +1,16 @@
+services:
+  performance-db:
+    image: bitnami/mysql:8.0.17
+    container_name: performance-db
+    volumes:
+      - mysql_data:/bitnami/mysql/data
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: perf
+      MYSQL_USER: perf
+      MYSQL_PASSWORD: perf
+    ports:
+      - 3306:3306
+
+volumes:
+  mysql_data:

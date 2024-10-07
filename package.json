@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "docker:build": "docker build -t $DOCKER_IMAGE_HOST/kls-performance:$npm_package_version .",
+    "docker:push": "docker push $DOCKER_IMAGE_HOST/kls-performance:$npm_package_version"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
@@ -16,7 +20,11 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.33.0",
+    "exceljs": "^4.4.0",
     "lucide-react": "^0.447.0",
+    "mysql2": "^3.11.3",
     "next": "14.2.14",
     "react": "^18",
     "react-day-picker": "^8.10.1",
@@ -28,6 +36,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "drizzle-kit": "^0.24.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.14",
     "postcss": "^8",

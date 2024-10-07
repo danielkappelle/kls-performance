@@ -1,5 +1,6 @@
 "use client";
 
+import { exportExcel } from "@/actions/export";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -26,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
+import { Input } from "@/components/ui/input";
 
 export default function BriefingDetails() {
   const [date, setDate] = React.useState<Date>();
@@ -38,6 +40,21 @@ export default function BriefingDetails() {
     "PH-KFD",
     "PH-KFE",
   ];
+
+  const onExport = async () => {
+    const buf = await exportExcel();
+
+    const buffer = Buffer.from(buf);
+    const blob = new Blob([buffer]);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = url;
+    a.download = "performance.xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <Card className="w-[350px]">
@@ -87,11 +104,15 @@ export default function BriefingDetails() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="pic">Pilot in command / student</Label>
+              <Input type="text" id="pic" />
+            </div>
           </div>
         </form>
       </CardContent>
       <CardFooter>
-        <Button>Export</Button>
+        <Button onClick={onExport}>Export</Button>
       </CardFooter>
     </Card>
   );
