@@ -28,18 +28,14 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
 import { Input } from "@/components/ui/input";
+import { AirframeSelect } from "@/db/schema";
 
-export default function BriefingDetails() {
+export default function BriefingDetails({
+  airframes,
+}: {
+  airframes: AirframeSelect[];
+}) {
   const [date, setDate] = React.useState<Date>();
-
-  const airframes = [
-    "PH-MFA",
-    "PH-KFA",
-    "PH-KFB",
-    "PH-KFC",
-    "PH-KFD",
-    "PH-KFE",
-  ];
 
   const onExport = async () => {
     const buf = await exportExcel();
@@ -97,8 +93,8 @@ export default function BriefingDetails() {
                 </SelectTrigger>
                 <SelectContent position="popper">
                   {airframes.map((airframe) => (
-                    <SelectItem value={airframe} key={airframe}>
-                      {airframe}
+                    <SelectItem value={airframe.registration} key={airframe.id}>
+                      {airframe.registration}
                     </SelectItem>
                   ))}
                 </SelectContent>
