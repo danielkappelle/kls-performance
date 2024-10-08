@@ -9,10 +9,11 @@ export interface TBriefing {
   airframe?: AirframeSelect;
   date?: Date;
   pic?: string;
-  departureColumn: TColumnState;
+  columns: TColumnState[];
 }
 
 export interface TColumnState {
+  name: string;
   aerodrome?: AerodromeSelect;
   runway?: RunwaySelect;
   condition?: TCondition;
@@ -29,14 +30,17 @@ export interface TColumnState {
 export interface TAction {
   type: string;
   payload: any;
+  columnIdx?: number;
 }
 
 const initialBriefing: TBriefing = {
   date: new Date(),
   pic: "KLMFA",
-  departureColumn: {
-    qnh: 1013,
-  },
+  columns: [
+    { name: "Departure", qnh: 1013 },
+    { name: "Destination", qnh: 1013 },
+    { name: "Alternate", qnh: 1013 },
+  ],
 };
 
 const BriefingContext = createContext<TBriefing>(initialBriefing);
@@ -85,68 +89,91 @@ function briefingReducer(briefing: TBriefing, action: TAction): TBriefing {
     case "setAerodrome": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          aerodrome: action.payload as AerodromeSelect,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, aerodrome: action.payload as AerodromeSelect };
+          } else {
+            return col;
+          }
+        }),
       };
     }
+
     case "setRunway": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          runway: action.payload as RunwaySelect,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, runway: action.payload as RunwaySelect };
+          } else {
+            return col;
+          }
+        }),
       };
     }
     case "setCondition": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          condition: action.payload as TCondition,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, condition: action.payload as TCondition };
+          } else {
+            return col;
+          }
+        }),
       };
     }
     case "setWindDir": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          windDir: action.payload as number,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, windDir: action.payload as number };
+          } else {
+            return col;
+          }
+        }),
       };
     }
     case "setWindKts": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          windKts: action.payload as number,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, windKts: action.payload as number };
+          } else {
+            return col;
+          }
+        }),
       };
     }
+
     case "setQnh": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          qnh: action.payload as number,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, qnh: action.payload as number };
+          } else {
+            return col;
+          }
+        }),
       };
     }
     case "setTemp": {
       return {
         ...briefing,
-        departureColumn: {
-          ...briefing.departureColumn,
-          temp: action.payload as number,
-        },
+        columns: briefing.columns.map((col, idx) => {
+          if (idx === action.columnIdx) {
+            return { ...col, temp: action.payload as number };
+          } else {
+            return col;
+          }
+        }),
       };
     }
     default: {
-      throw Error("Unknown action: " + action.type);
+      console.error("Unknown action: " + action.type);
     }
   }
 }

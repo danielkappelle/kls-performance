@@ -31,8 +31,10 @@ import {
 import { BriefingPerfTable } from "./briefing-perf-table";
 
 export default function BriefingColumn({
+  columnIdx,
   aerodromes,
 }: {
+  columnIdx: number;
   aerodromes: AerodromeSelect[];
 }) {
   const dispatch = useBriefingDispatch();
@@ -42,67 +44,72 @@ export default function BriefingColumn({
   const setAerodrome = (id: string) => {
     dispatch({
       type: "setAerodrome",
+      columnIdx,
       payload: aerodromes.find((a) => a.id === +id),
     });
   };
 
   const setRunway = (id: string) => {
-    dispatch({ type: "setRunway", payload: runways.find((r) => r.id === +id) });
+    dispatch({
+      columnIdx,
+      type: "setRunway",
+      payload: runways.find((r) => r.id === +id),
+    });
   };
 
   const setCondition = (condition: TCondition) => {
-    dispatch({ type: "setCondition", payload: condition });
+    dispatch({ columnIdx, type: "setCondition", payload: condition });
   };
 
   const setWindDir = (dir: number) => {
-    dispatch({ type: "setWindDir", payload: dir });
+    dispatch({ columnIdx, type: "setWindDir", payload: dir });
   };
 
   const setWindKts = (kts: number) => {
-    dispatch({ type: "setWindKts", payload: kts });
+    dispatch({ columnIdx, type: "setWindKts", payload: kts });
   };
 
   const setQnh = (qnh: number) => {
-    dispatch({ type: "setQnh", payload: qnh });
+    dispatch({ columnIdx, type: "setQnh", payload: qnh });
   };
 
   const setTemp = (temp: number) => {
-    dispatch({ type: "setTemp", payload: temp });
+    dispatch({ columnIdx, type: "setTemp", payload: temp });
   };
 
   const [runways, setRunways] = useState<RunwaySelect[]>([]);
 
   useEffect(() => {
-    if (!briefing.departureColumn.aerodrome) return;
+    if (!briefing.columns[columnIdx].aerodrome) return;
     setRunway("");
-    getRunways(briefing.departureColumn.aerodrome.id).then(setRunways);
-  }, [briefing.departureColumn.aerodrome]);
+    getRunways(briefing.columns[columnIdx].aerodrome.id).then(setRunways);
+  }, [briefing.columns[columnIdx].aerodrome]);
 
   const pa =
-    (briefing.departureColumn.aerodrome?.elevation || 0) +
-    (1013 - (briefing.departureColumn.qnh || 1013)) * 27;
+    (briefing.columns[columnIdx].aerodrome?.elevation || 0) +
+    (1013 - (briefing.columns[columnIdx].qnh || 1013)) * 27;
 
   const hw =
     Math.cos(
       deg2rad(
-        (briefing.departureColumn.windDir || 0) -
-          (briefing.departureColumn.runway?.direction || 0)
+        (briefing.columns[columnIdx].windDir || 0) -
+          (briefing.columns[columnIdx].runway?.direction || 0)
       )
-    ) * (briefing.departureColumn.windKts || 0);
+    ) * (briefing.columns[columnIdx].windKts || 0);
 
   const [perfValues, setPerfValues] = useState<TTableValues>(emptyPerformance);
 
   const perfTable = getValueFromTable(
     briefing.airframe,
     pa,
-    briefing.departureColumn.temp || 15
+    briefing.columns[columnIdx].temp || 15
   );
 
   const takeOffTable = getPerformance(
     "takeOff",
     perfTable,
     hw,
-    briefing.departureColumn.condition || "dry",
+    briefing.columns[columnIdx].condition || "dry",
     0
   );
 
@@ -110,7 +117,7 @@ export default function BriefingColumn({
     "landing",
     perfTable,
     hw,
-    briefing.departureColumn.condition || "dry",
+    briefing.columns[columnIdx].condition || "dry",
     0
   );
 
@@ -118,14 +125,14 @@ export default function BriefingColumn({
     "landingFlapless",
     perfTable,
     hw,
-    briefing.departureColumn.condition || "dry",
+    briefing.columns[columnIdx].condition || "dry",
     0
   );
 
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>Departure</CardTitle>
+        <CardTitle>{briefing.columns[columnIdx].name}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid w-full items-center gap-4">
@@ -212,7 +219,7 @@ export default function BriefingColumn({
                 <Input
                   type="number"
                   id="qnh"
-                  value={briefing.departureColumn.qnh}
+                  value={briefing.columns[columnIdx].qnh}
                   onChange={(e) => setQnh(+e.target.value)}
                 />
               </div>
@@ -221,11 +228,11 @@ export default function BriefingColumn({
           <hr />
           <div className="flex flex-row justify-between">
             <Label>Runway direction</Label>
-            <Label>{briefing.departureColumn.runway?.direction}º</Label>
+            <Label>{briefing.columns[columnIdx].runway?.direction}º</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Elevation</Label>
-            <Label>{briefing.departureColumn.aerodrome?.elevation} ft</Label>
+            <Label>{briefing.columns[columnIdx].aerodrome?.elevation} ft</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Pressure altitude</Label>
@@ -233,7 +240,7 @@ export default function BriefingColumn({
           </div>
           <div className="flex flex-row justify-between">
             <Label>Surface</Label>
-            <Label>{briefing.departureColumn.runway?.surface}</Label>
+            <Label>{briefing.columns[columnIdx].runway?.surface}</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>{hw && hw < 0 ? "Tailwind" : "Headwind"} </Label>
@@ -241,19 +248,19 @@ export default function BriefingColumn({
           </div>
           <div className="flex flex-row justify-between">
             <Label>Slope</Label>
-            <Label>{briefing.departureColumn.runway?.slope}%</Label>
+            <Label>{briefing.columns[columnIdx].runway?.slope}%</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>TORA</Label>
-            <Label>{briefing.departureColumn.runway?.tora} m</Label>
+            <Label>{briefing.columns[columnIdx].runway?.tora} m</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>TODA</Label>
-            <Label>{briefing.departureColumn.runway?.toda} m</Label>
+            <Label>{briefing.columns[columnIdx].runway?.toda} m</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>LDA</Label>
-            <Label>{briefing.departureColumn.runway?.lda} m</Label>
+            <Label>{briefing.columns[columnIdx].runway?.lda} m</Label>
           </div>
           <hr />
           <BriefingPerfTable table={takeOffTable} tableTitle="Take-off" />
