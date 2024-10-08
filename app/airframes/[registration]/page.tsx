@@ -1,6 +1,7 @@
 import { getAirframeByReg } from "@/actions/db/airframe";
 import {
   Table,
+  TableBody,
   TableCell,
   TableHead,
   TableHeader,
@@ -63,7 +64,7 @@ function getPerfTable(table: string | null, title: string) {
           <TableHead className="border">50 / 122</TableHead>
         </TableRow>
       </TableHeader>
-      <tbody>{getRows(table)}</tbody>
+      <TableBody>{getRows(table)}</TableBody>
     </Table>
   );
 }

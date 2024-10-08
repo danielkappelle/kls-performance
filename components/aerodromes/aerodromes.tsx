@@ -1,16 +1,17 @@
 "use client";
 import { buttonVariants } from "@/components/ui/button";
-import { AirframeSelect } from "@/db/schema";
+import { AerodromeSelect } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  airframes: AirframeSelect[];
+  aerodromes: AerodromeSelect[];
 }
 
 export function SidebarNav({
   className,
-  airframes,
+  aerodromes,
   ...props
 }: SidebarNavProps) {
   const pathname = usePathname();
@@ -23,19 +24,19 @@ export function SidebarNav({
       )}
       {...props}
     >
-      {airframes.map((airframe) => (
+      {aerodromes.map((ad) => (
         <Link
-          key={airframe.id}
-          href={`/airframes/${airframe.registration}`}
+          key={ad.id}
+          href={`/aerodromes/${ad.icaoCode}`}
           className={cn(
             buttonVariants({ variant: "ghost" }),
-            pathname === `/airframes/${airframe.registration}`
+            pathname === `/aerodromes/${ad.icaoCode}`
               ? "bg-muted hover:bg-muted"
               : "hover:bg-transparent hover:underline",
             "justify-start"
           )}
         >
-          {airframe.registration}
+          {ad.icaoCode}
         </Link>
       ))}
     </nav>
