@@ -15,13 +15,11 @@ export default function BriefingComponent({
 
   return (
     <BriefingProvider>
-      <div className="container mx-auto my-5">
-        <div className="flex flex-row gap-4 items-start">
-          <BriefingDetails airframes={airframes} />
-          {briefing.columns.map((col, idx) => (
-            <BriefingColumn columnIdx={idx} aerodromes={aerodromes} key={idx} />
-          ))}
-        </div>
+      <div className="flex flex-row gap-4 items-start">
+        <BriefingDetails airframes={airframes} />
+        {briefing.columns.map((col, idx) => (
+          <BriefingColumn columnIdx={idx} aerodromes={aerodromes} key={idx} />
+        ))}
       </div>
     </BriefingProvider>
   );
