@@ -1,6 +1,21 @@
 import { TCondition } from "@/components/briefing/briefing-state";
 import { AirframeSelect, RunwaySelect } from "@/db/schema";
 
+export type TPerformancetable = {
+  roll: number;
+  dist: number;
+  windCorrectionPercent: number;
+  windCorrectionRoll: number;
+  windCorrectionDist: number;
+  subTotalRoll: number;
+  subTotalDist: number;
+  conditionCorrectionPercent: number;
+  conditionCorrectionRoll: number;
+  conditionCorrectionDist: number;
+  totalRoll: number;
+  totalDist: number;
+};
+
 export type TTableValues = {
   takeOff: {
     roll: number;
@@ -91,14 +106,24 @@ function getWindCorrection(hw: number) {
   }
 }
 
-export function getTakeOffPerformance(
+export function getPerformance(
+  phase: "takeOff" | "landing" | "landingFlapless",
   table: TTableValues,
   hw: number,
   condition: TCondition,
   slope: number
-) {
-  const roll = table.takeOff.roll;
-  const dist = table.takeOff.dist;
+): TPerformancetable {
+  let roll, dist: number;
+  if (phase === "takeOff") {
+    roll = table.takeOff.roll;
+    dist = table.takeOff.dist;
+  } else if (phase === "landing") {
+    roll = table.landing.roll;
+    dist = table.landing.dist;
+  } else {
+    roll = table.landingFlapless.roll;
+    dist = table.landingFlapless.dist;
+  }
 
   const windCorrectionPercent = getWindCorrection(hw);
   const windCorrectionRoll = (windCorrectionPercent / 100) * roll;
@@ -107,7 +132,8 @@ export function getTakeOffPerformance(
   const subTotalRoll = roll - windCorrectionRoll;
   const subTotalDist = dist - windCorrectionDist;
 
-  const conditionCorrectionPercent = condition === "dry" ? 0 : 10;
+  const conditionCorrectionPercent =
+    condition === "dry" ? 0 : phase === "takeOff" ? 10 : 15;
   const conditionCorrectionRoll = (conditionCorrectionPercent / 100) * roll;
   const conditionCorrectionDist = (conditionCorrectionPercent / 100) * dist;
 

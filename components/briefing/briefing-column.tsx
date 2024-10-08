@@ -24,10 +24,11 @@ import { useEffect, useState } from "react";
 import { TCondition, useBriefing, useBriefingDispatch } from "./briefing-state";
 import {
   emptyPerformance,
-  getTakeOffPerformance,
+  getPerformance,
   getValueFromTable,
   TTableValues,
 } from "@/lib/parse-table";
+import { BriefingPerfTable } from "./briefing-perf-table";
 
 export default function BriefingColumn({
   aerodromes,
@@ -97,7 +98,24 @@ export default function BriefingColumn({
     briefing.departureColumn.temp || 15
   );
 
-  const takeOffTable = getTakeOffPerformance(
+  const takeOffTable = getPerformance(
+    "takeOff",
+    perfTable,
+    hw,
+    briefing.departureColumn.condition || "dry",
+    0
+  );
+
+  const landingTable = getPerformance(
+    "landing",
+    perfTable,
+    hw,
+    briefing.departureColumn.condition || "dry",
+    0
+  );
+
+  const landingFlaplessTable = getPerformance(
+    "landingFlapless",
     perfTable,
     hw,
     briefing.departureColumn.condition || "dry",
@@ -238,60 +256,12 @@ export default function BriefingColumn({
             <Label>{briefing.departureColumn.runway?.lda} m</Label>
           </div>
           <hr />
-          <Table className="border-collapse border">
-            <TableHeader className="text-left">
-              <TableRow>
-                <TableHead className="border">Take-off</TableHead>
-                <TableHead className="border">Cor %</TableHead>
-                <TableHead className="border">Roll</TableHead>
-                <TableHead className="border">Distance</TableHead>
-              </TableRow>
-            </TableHeader>
-            <tbody>
-              <TableRow>
-                <TableCell>Basic</TableCell>
-                <TableCell></TableCell>
-                <TableCell>{takeOffTable.roll}</TableCell>
-                <TableCell>{takeOffTable.dist}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Wind</TableCell>
-                <TableCell>
-                  {takeOffTable.windCorrectionPercent.toFixed(0)}
-                </TableCell>
-                <TableCell>
-                  {takeOffTable.windCorrectionRoll.toFixed(0)}
-                </TableCell>
-                <TableCell>
-                  {takeOffTable.windCorrectionDist.toFixed(0)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Subtotal</TableCell>
-                <TableCell></TableCell>
-                <TableCell>{takeOffTable.subTotalRoll.toFixed(0)}</TableCell>
-                <TableCell>{takeOffTable.subTotalDist.toFixed(0)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Surface / cont.</TableCell>
-                <TableCell>{takeOffTable.conditionCorrectionPercent}</TableCell>
-                <TableCell>{takeOffTable.conditionCorrectionRoll}</TableCell>
-                <TableCell>{takeOffTable.conditionCorrectionDist}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Slope</TableCell>
-                <TableCell>0</TableCell>
-                <TableCell>0</TableCell>
-                <TableCell>0</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Total in meters</TableCell>
-                <TableCell></TableCell>
-                <TableCell>{takeOffTable.totalRoll.toFixed(0)}</TableCell>
-                <TableCell>{takeOffTable.totalDist.toFixed(0)}</TableCell>
-              </TableRow>
-            </tbody>
-          </Table>
+          <BriefingPerfTable table={takeOffTable} tableTitle="Take-off" />
+          <BriefingPerfTable table={landingTable} tableTitle="Landing" />
+          <BriefingPerfTable
+            table={landingFlaplessTable}
+            tableTitle="Landing flapless"
+          />
         </div>
       </CardContent>
     </Card>
