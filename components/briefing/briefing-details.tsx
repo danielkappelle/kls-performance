@@ -40,7 +40,7 @@ export default function BriefingDetails({
   const briefing = useBriefing();
 
   const onExport = async () => {
-    const buf = await exportExcel();
+    const buf = await exportExcel(briefing);
 
     const buffer = Buffer.from(buf);
     const blob = new Blob([buffer]);
