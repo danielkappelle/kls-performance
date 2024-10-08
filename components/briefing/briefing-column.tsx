@@ -21,38 +21,73 @@ import {
 import { AerodromeSelect, RunwaySelect } from "@/db/schema";
 import { deg2rad } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { TCondition, useBriefing, useBriefingDispatch } from "./briefing-state";
 
 export default function BriefingColumn({
   aerodromes,
 }: {
   aerodromes: AerodromeSelect[];
 }) {
-  const [ad, setAd] = useState<AerodromeSelect>();
+  const dispatch = useBriefingDispatch();
+  const briefing = useBriefing();
+
+  // Setters
+  const setAerodrome = (id: string) => {
+    dispatch({
+      type: "setAerodrome",
+      payload: aerodromes.find((a) => a.id === +id),
+    });
+  };
+
+  const setRunway = (id: string) => {
+    dispatch({ type: "setRunway", payload: runways.find((r) => r.id === +id) });
+  };
+
+  const setCondition = (condition: TCondition) => {
+    dispatch({ type: "setCondition", payload: condition });
+  };
+
+  const setWindDir = (dir: number) => {
+    dispatch({ type: "setWindDir", payload: dir });
+  };
+
+  const setWindKts = (kts: number) => {
+    dispatch({ type: "setWindKts", payload: kts });
+  };
+
+  const setQnh = (qnh: number) => {
+    dispatch({ type: "setQnh", payload: qnh });
+  };
+
+  const setTemp = (temp: number) => {
+    dispatch({ type: "setTemp", payload: temp });
+  };
+
   const [runways, setRunways] = useState<RunwaySelect[]>([]);
-  const [runway, setRunway] = useState<RunwaySelect>();
-  const [condition, setCondition] = useState<string>();
-  const [windDir, setWindDir] = useState<number>();
-  const [windKts, setWindKts] = useState<number>();
-  const [qnh, setQnh] = useState<number>(1013);
-  const [temp, setTemp] = useState<number>();
-
-  const [pa, setPa] = useState<number>();
-  const [hw, setHw] = useState<number>();
 
   useEffect(() => {
-    if (!ad) return;
-    setRunway(null);
-    getRunways(ad.id).then(setRunways);
-  }, [ad]);
+    if (!briefing.departureColumn.aerodrome) return;
+    setRunway("");
+    getRunways(briefing.departureColumn.aerodrome.id).then(setRunways);
+  }, [briefing.departureColumn.aerodrome]);
 
-  useEffect(() => {
-    // Pressure altitude
-    setPa((ad?.elevation || 0) + (1013 - qnh) * 27);
-    setHw(
-      Math.cos(deg2rad((windDir || 0) - (runway?.direction || 0))) *
-        (windKts || 0)
+  const getPa = () => {
+    return (
+      (briefing.departureColumn.aerodrome?.elevation || 0) +
+      (1013 - (briefing.departureColumn.qnh || 1013)) * 27
     );
-  }, [condition, windDir, windKts, qnh, temp]);
+  };
+
+  const getHw = () => {
+    return (
+      Math.cos(
+        deg2rad(
+          (briefing.departureColumn.windDir || 0) -
+            (briefing.departureColumn.runway?.direction || 0)
+        )
+      ) * (briefing.departureColumn.windKts || 0)
+    );
+  };
 
   return (
     <Card className="w-[350px]">
@@ -65,11 +100,7 @@ export default function BriefingColumn({
             <div className="flex flex-row gap-2 w-full">
               <div className="flex flex-col space-y-1.5 flex-grow">
                 <Label htmlFor="aerodrome">Aerodrome</Label>
-                <Select
-                  onValueChange={(id) =>
-                    setAd(aerodromes.find((ad) => ad.id === +id))
-                  }
-                >
+                <Select onValueChange={setAerodrome}>
                   <SelectTrigger id="aerodrome">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -84,11 +115,7 @@ export default function BriefingColumn({
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="runway">Runway</Label>
-                <Select
-                  onValueChange={(id) =>
-                    setRunway(runways.find((rwy) => rwy.id === +id))
-                  }
-                >
+                <Select onValueChange={setRunway}>
                   <SelectTrigger id="runway">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -104,7 +131,7 @@ export default function BriefingColumn({
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="condition">Condition</Label>
-              <Select onValueChange={(e) => setCondition(e)}>
+              <Select onValueChange={setCondition}>
                 <SelectTrigger id="condition">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
@@ -152,7 +179,7 @@ export default function BriefingColumn({
                 <Input
                   type="number"
                   id="qnh"
-                  value={qnh}
+                  value={briefing.departureColumn.qnh}
                   onChange={(e) => setQnh(+e.target.value)}
                 />
               </div>
@@ -161,39 +188,39 @@ export default function BriefingColumn({
           <hr />
           <div className="flex flex-row justify-between">
             <Label>Runway direction</Label>
-            <Label>{runway?.direction}º</Label>
+            <Label>{briefing.departureColumn.runway?.direction}º</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Elevation</Label>
-            <Label>{ad?.elevation} ft</Label>
+            <Label>{briefing.departureColumn.aerodrome?.elevation} ft</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Pressure altitude</Label>
-            <Label>{pa} ft</Label>
+            <Label>{getPa()} ft</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Surface</Label>
-            <Label>{runway?.surface}</Label>
+            <Label>{briefing.departureColumn.runway?.surface}</Label>
           </div>
           <div className="flex flex-row justify-between">
-            <Label>{hw && hw < 0 ? "Tailwind" : "Headwind"} </Label>
-            <Label>{Math.abs(hw || 0).toFixed(0)} kts</Label>
+            <Label>{getHw() && getHw() < 0 ? "Tailwind" : "Headwind"} </Label>
+            <Label>{Math.abs(getHw() || 0).toFixed(0)} kts</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Slope</Label>
-            <Label>{runway?.slope}%</Label>
+            <Label>{briefing.departureColumn.runway?.slope}%</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>TORA</Label>
-            <Label>{runway?.tora} m</Label>
+            <Label>{briefing.departureColumn.runway?.tora} m</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>TODA</Label>
-            <Label>{runway?.toda} m</Label>
+            <Label>{briefing.departureColumn.runway?.toda} m</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>LDA</Label>
-            <Label>{runway?.lda} m</Label>
+            <Label>{briefing.departureColumn.runway?.lda} m</Label>
           </div>
           <hr />
           <Table className="border-collapse border">
