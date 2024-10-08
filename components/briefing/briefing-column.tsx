@@ -22,6 +22,12 @@ import { AerodromeSelect, RunwaySelect } from "@/db/schema";
 import { deg2rad } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { TCondition, useBriefing, useBriefingDispatch } from "./briefing-state";
+import {
+  emptyPerformance,
+  getTakeOffPerformance,
+  getValueFromTable,
+  TTableValues,
+} from "@/lib/parse-table";
 
 export default function BriefingColumn({
   aerodromes,
@@ -71,23 +77,32 @@ export default function BriefingColumn({
     getRunways(briefing.departureColumn.aerodrome.id).then(setRunways);
   }, [briefing.departureColumn.aerodrome]);
 
-  const getPa = () => {
-    return (
-      (briefing.departureColumn.aerodrome?.elevation || 0) +
-      (1013 - (briefing.departureColumn.qnh || 1013)) * 27
-    );
-  };
+  const pa =
+    (briefing.departureColumn.aerodrome?.elevation || 0) +
+    (1013 - (briefing.departureColumn.qnh || 1013)) * 27;
 
-  const getHw = () => {
-    return (
-      Math.cos(
-        deg2rad(
-          (briefing.departureColumn.windDir || 0) -
-            (briefing.departureColumn.runway?.direction || 0)
-        )
-      ) * (briefing.departureColumn.windKts || 0)
-    );
-  };
+  const hw =
+    Math.cos(
+      deg2rad(
+        (briefing.departureColumn.windDir || 0) -
+          (briefing.departureColumn.runway?.direction || 0)
+      )
+    ) * (briefing.departureColumn.windKts || 0);
+
+  const [perfValues, setPerfValues] = useState<TTableValues>(emptyPerformance);
+
+  const perfTable = getValueFromTable(
+    briefing.airframe,
+    pa,
+    briefing.departureColumn.temp || 15
+  );
+
+  const takeOffTable = getTakeOffPerformance(
+    perfTable,
+    hw,
+    briefing.departureColumn.condition || "dry",
+    0
+  );
 
   return (
     <Card className="w-[350px]">
@@ -136,8 +151,8 @@ export default function BriefingColumn({
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent position="popper">
-                  <SelectItem value="Dry">Dry</SelectItem>
-                  <SelectItem value="Wet">Wet</SelectItem>
+                  <SelectItem value="dry">Dry</SelectItem>
+                  <SelectItem value="wet">Wet</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -196,15 +211,15 @@ export default function BriefingColumn({
           </div>
           <div className="flex flex-row justify-between">
             <Label>Pressure altitude</Label>
-            <Label>{getPa()} ft</Label>
+            <Label>{pa} ft</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Surface</Label>
             <Label>{briefing.departureColumn.runway?.surface}</Label>
           </div>
           <div className="flex flex-row justify-between">
-            <Label>{getHw() && getHw() < 0 ? "Tailwind" : "Headwind"} </Label>
-            <Label>{Math.abs(getHw() || 0).toFixed(0)} kts</Label>
+            <Label>{hw && hw < 0 ? "Tailwind" : "Headwind"} </Label>
+            <Label>{Math.abs(hw || 0).toFixed(0)} kts</Label>
           </div>
           <div className="flex flex-row justify-between">
             <Label>Slope</Label>
@@ -236,26 +251,32 @@ export default function BriefingColumn({
               <TableRow>
                 <TableCell>Basic</TableCell>
                 <TableCell></TableCell>
-                <TableCell>400</TableCell>
-                <TableCell>660</TableCell>
+                <TableCell>{takeOffTable.roll}</TableCell>
+                <TableCell>{takeOffTable.dist}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Wind</TableCell>
-                <TableCell>8</TableCell>
-                <TableCell>32</TableCell>
-                <TableCell>52</TableCell>
+                <TableCell>
+                  {takeOffTable.windCorrectionPercent.toFixed(0)}
+                </TableCell>
+                <TableCell>
+                  {takeOffTable.windCorrectionRoll.toFixed(0)}
+                </TableCell>
+                <TableCell>
+                  {takeOffTable.windCorrectionDist.toFixed(0)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Subtotal</TableCell>
                 <TableCell></TableCell>
-                <TableCell>368</TableCell>
-                <TableCell>608</TableCell>
+                <TableCell>{takeOffTable.subTotalRoll.toFixed(0)}</TableCell>
+                <TableCell>{takeOffTable.subTotalDist.toFixed(0)}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Surface / cont.</TableCell>
-                <TableCell>15</TableCell>
-                <TableCell>60</TableCell>
-                <TableCell>99</TableCell>
+                <TableCell>{takeOffTable.conditionCorrectionPercent}</TableCell>
+                <TableCell>{takeOffTable.conditionCorrectionRoll}</TableCell>
+                <TableCell>{takeOffTable.conditionCorrectionDist}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Slope</TableCell>
@@ -266,8 +287,8 @@ export default function BriefingColumn({
               <TableRow>
                 <TableCell>Total in meters</TableCell>
                 <TableCell></TableCell>
-                <TableCell>428</TableCell>
-                <TableCell>707</TableCell>
+                <TableCell>{takeOffTable.totalRoll.toFixed(0)}</TableCell>
+                <TableCell>{takeOffTable.totalDist.toFixed(0)}</TableCell>
               </TableRow>
             </tbody>
           </Table>
