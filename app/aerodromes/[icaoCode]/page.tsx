@@ -1,5 +1,4 @@
 import { getAerodromeByIcaoCode } from "@/actions/db/aerodrome";
-import { getAirframeByReg } from "@/actions/db/airframe";
 import { getRunways } from "@/actions/db/runway";
 import {
   Table,
@@ -10,8 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RunwaySelect } from "@/db/schema";
-import { table } from "console";
-import { title } from "process";
 
 export default async function AerodromePage({
   params,
@@ -36,7 +33,7 @@ export default async function AerodromePage({
 
 function runwayInfo(runway: RunwaySelect) {
   return (
-    <div className="mt-3">
+    <div className="mt-3" key={runway.id}>
       <h2 className="text-md font-bold tracking-tight">{runway.code}</h2>
       <Table className="border-collapse border text-center mt-3">
         <TableHeader>

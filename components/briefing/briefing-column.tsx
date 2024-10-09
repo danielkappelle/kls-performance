@@ -130,7 +130,7 @@ export default function BriefingColumn({
   );
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-[350px] shrink-0">
       <CardHeader>
         <CardTitle>{briefing.columns[columnIdx].name}</CardTitle>
       </CardHeader>

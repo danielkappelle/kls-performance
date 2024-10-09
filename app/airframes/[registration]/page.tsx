@@ -80,7 +80,6 @@ function getRows(tableString: string | null) {
 
   const n = table.length;
   const nRows = Math.round(n / 12);
-  console.log(n);
 
   const dom = [];
 
