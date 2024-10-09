@@ -1,6 +1,8 @@
 import { getAirframes } from "@/actions/db/airframe";
 import { SidebarNav } from "@/components/airframes/airframes";
 
+export const dynamic = "force-dynamic";
+
 export default async function AirframesLayout({
   children,
 }: {

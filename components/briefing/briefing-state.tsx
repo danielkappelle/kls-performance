@@ -29,6 +29,7 @@ export interface TColumnState {
 
 export interface TAction {
   type: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: any;
   columnIdx?: number;
 }
@@ -174,6 +175,7 @@ function briefingReducer(briefing: TBriefing, action: TAction): TBriefing {
     }
     default: {
       console.error("Unknown action: " + action.type);
+      return briefing;
     }
   }
 }

@@ -1,6 +1,6 @@
 export default function AboutPage() {
   return (
-    <div class="mx-auto w-1/2">
+    <div className="mx-auto w-1/2">
       <h2 className="text-2xl font-bold tracking-tight">About</h2>
       <p className="text-muted-foreground">
         In order to speed up the process of creating a performance calculation

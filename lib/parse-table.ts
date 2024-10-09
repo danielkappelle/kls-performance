@@ -1,5 +1,5 @@
 import { TCondition } from "@/components/briefing/briefing-state";
-import { AirframeSelect, RunwaySelect } from "@/db/schema";
+import { AirframeSelect } from "@/db/schema";
 
 export type TPerformancetable = {
   roll: number;
@@ -111,6 +111,7 @@ export function getPerformance(
   table: TTableValues,
   hw: number,
   condition: TCondition,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   slope: number
 ): TPerformancetable {
   let roll, dist: number;

@@ -1,5 +1,4 @@
 "use client";
-import { getAerodromes } from "@/actions/db/aerodrome";
 import { getRunways } from "@/actions/db/runway";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,24 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { AerodromeSelect, RunwaySelect } from "@/db/schema";
+import { getPerformance, getValueFromTable } from "@/lib/parse-table";
 import { deg2rad } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { TCondition, useBriefing, useBriefingDispatch } from "./briefing-state";
-import {
-  emptyPerformance,
-  getPerformance,
-  getValueFromTable,
-  TTableValues,
-} from "@/lib/parse-table";
+import { useState } from "react";
 import { BriefingPerfTable } from "./briefing-perf-table";
+import { TCondition, useBriefing, useBriefingDispatch } from "./briefing-state";
 
 export default function BriefingColumn({
   columnIdx,
@@ -42,6 +29,8 @@ export default function BriefingColumn({
 
   // Setters
   const setAerodrome = (id: string) => {
+    getRunways(+id).then(setRunways);
+    setRunway("");
     dispatch({
       type: "setAerodrome",
       columnIdx,
@@ -79,12 +68,6 @@ export default function BriefingColumn({
 
   const [runways, setRunways] = useState<RunwaySelect[]>([]);
 
-  useEffect(() => {
-    if (!briefing.columns[columnIdx].aerodrome) return;
-    setRunway("");
-    getRunways(briefing.columns[columnIdx].aerodrome.id).then(setRunways);
-  }, [briefing.columns[columnIdx].aerodrome]);
-
   const pa =
     (briefing.columns[columnIdx].aerodrome?.elevation || 0) +
     (1013 - (briefing.columns[columnIdx].qnh || 1013)) * 27;
@@ -96,8 +79,6 @@ export default function BriefingColumn({
           (briefing.columns[columnIdx].runway?.direction || 0)
       )
     ) * (briefing.columns[columnIdx].windKts || 0);
-
-  const [perfValues, setPerfValues] = useState<TTableValues>(emptyPerformance);
 
   const perfTable = getValueFromTable(
     briefing.airframe,

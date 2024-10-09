@@ -47,7 +47,7 @@ export default function BriefingDetails({
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     document.body.appendChild(a);
-    a.style = "display: none";
+    a.setAttribute("style", "display:none");
     a.href = url;
     a.download = "performance.xlsx";
     a.click();

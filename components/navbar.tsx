@@ -1,12 +1,5 @@
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 
 export default function Navbar() {
@@ -76,6 +69,7 @@ export default function Navbar() {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function MenuIcon(props: any) {
   return (
     <svg

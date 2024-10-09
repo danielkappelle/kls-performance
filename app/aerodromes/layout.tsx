@@ -1,6 +1,8 @@
 import { getAerodromes } from "@/actions/db/aerodrome";
 import { SidebarNav } from "@/components/aerodromes/aerodromes";
 
+export const dynamic = "force-dynamic";
+
 export default async function AerodromesLayout({
   children,
 }: {

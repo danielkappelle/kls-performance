@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import { RunwaySelect } from "@/db/schema";
 
+export const dynamic = "force-dynamic";
+
 export default async function AerodromePage({
   params,
 }: {
