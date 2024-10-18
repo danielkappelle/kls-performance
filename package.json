@@ -1,6 +1,6 @@
 {
   "name": "kls-performance",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -26,11 +26,14 @@
     "drizzle-orm": "^0.33.0",
     "exceljs": "^4.4.0",
     "lucide-react": "^0.447.0",
+    "mailersend": "^2.3.0",
     "mysql2": "^3.11.3",
     "next": "14.2.14",
+    "next-auth": "^5.0.0-beta.22",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
+    "react-google-recaptcha-v3": "^1.10.1",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7"
   },

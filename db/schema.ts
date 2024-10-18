@@ -1,9 +1,11 @@
-import { InferSelectModel, relations } from "drizzle-orm";
+import { InferSelectModel, relations, sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   float,
   mysqlEnum,
   mysqlTable,
+  timestamp,
   varchar,
 } from "drizzle-orm/mysql-core";
 
@@ -51,6 +53,16 @@ export const RunwayRelations = relations(Runway, ({ one }) => ({
     references: [Aerodrome.id],
   }),
 }));
+
+export const AccessToken = mysqlTable("access_token", {
+  id: bigint("id", { mode: "number", unsigned: true })
+    .autoincrement()
+    .primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  token: varchar("token", { length: 255 }).unique().notNull(),
+  used: boolean("used").default(false),
+  created: timestamp("created").default(sql`CURRENT_TIMESTAMP`),
+});
 
 export type AirframeSelect = InferSelectModel<typeof Airframe>;
 export type AerodromeSelect = InferSelectModel<typeof Aerodrome>;
